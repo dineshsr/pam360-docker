@@ -1,0 +1,20 @@
+# Mon Jan 13 19:20:33 IST 2020
+# Replay feature output
+# ---------------------
+# This file was built by the Replay feature of InstallAnywhere.
+# It contains variables that were set by Panels, Consoles or Custom Code.
+
+
+
+#Choose Installation Folder
+#--------------------------
+USER_INSTALL_DIR=/home/pamuser/ManageEngine/PAM360
+
+#Server Configuration
+#--------------------
+USER_INPUT_RESULT_0=1
+USER_INPUT_RESULT_5=0
+
+#Install
+#-------
+-fileOverwrite_/home/pamuser/ManageEngine/PAM360/_ManageEngine PAM360_installation/Change ManageEngine PAM360 Installation.lax=Yes

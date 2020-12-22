@@ -1,0 +1,3 @@
+chmod a+x Manage.bin install.txt
+
+sudo bash pam360.sh install
