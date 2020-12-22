@@ -1,2 +1,2 @@
-# pam360-docker
-Dockerized image for PAM360
+# ManageEngine PAM360
+Building dockerized image for PAM360
