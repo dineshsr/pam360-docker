@@ -1,0 +1,15 @@
+Steps to be followed
+
+docker build -t=pam360:4001 .
+docker run -d -p 8282:8282 pam360:4001 cmd.exe
+docker ps 
+docker exec -it containerid cmd.exe
+
+docker commit container id
+docker tag <current image id> <new image name>
+docker stop containerid
+docker start containerid
+
+
+del ME_PAM360.exe
+del setup.iss
