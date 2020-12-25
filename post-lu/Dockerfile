@@ -8,8 +8,8 @@ ARG PMP_VERSION=11004
 ENV PMP_VERSION=$PMP_VERSION \
     PMP_HOME=$PMP_HOME \
     SERVER_STATE=master \
-    TIMEOUT_DB=60 \
-    TIMEOUT_PMP=300 \
+    TIMEOUT_DB=120 \
+    TIMEOUT_PMP=600 \
     PMP_PORT=7272
 
 COPY pmp.properties /tmp/pmp.properties
