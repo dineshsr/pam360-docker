@@ -8,18 +8,18 @@ POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pmppassword}
 
 SERVER_STATE=${SERVER_STATE:-master}
 TIMEOUT_DB=${TIMEOUT_DB:-120}
-TIMEOUT_PMP=${TIMEOUT_PMP:-600}
+TIMEOUT_PAM=${TIMEOUT_PAM:-600}
 
-PMP_PORT=${PMP_PORT:-7272}
+PAM_PORT=${PAM_PORT:-8282}
 
 sync_pmp_home_dir() {
-  local PMP_TMP_HOME="/srv/PMP.orig"
-  local lockfile="${PMP_HOME}/.INIT_SYNC_DONE"
+  local PAM_TMP_HOME="/srv/PMP.orig"
+  local lockfile="${PAM_HOME}/.INIT_SYNC_DONE"
 
   if ! [[ -e "$lockfile" ]]
   then
-    echo "Copying PMP_HOME contents to $PMP_HOME"
-    if cp -a "$PMP_TMP_HOME" "$PMP_HOME"
+    echo "Copying PAM_HOME contents to $PAM_HOME"
+    if cp -a "$PAM_TMP_HOME" "$PAM_HOME"
     then
       touch "$lockfile"
     fi
@@ -27,7 +27,7 @@ sync_pmp_home_dir() {
 }
 
 set_server_state() {
-  echo "$SERVER_STATE" > "${PMP_HOME}/conf/serverstate.conf"
+  echo "$SERVER_STATE" > "${PAM_HOME}/conf/serverstate.conf"
 }
 
 init_conf_dir() {
@@ -37,16 +37,16 @@ init_conf_dir() {
   if ! [[ -e "$lockfile" ]]
   then
     echo "Copying config files to ${ext_conf_path}."
-    if cp -a "${PMP_HOME}/conf.orig/"* "$ext_conf_path"
+    if cp -a "${PAM_HOME}/conf.orig/"* "$ext_conf_path"
     then
       touch "$lockfile"
     fi
   fi
 
-  # Ensure PMP_HOME/conf is symlinked to /config
-  if ! [[ -L "${PMP_HOME}/conf" ]]
+  # Ensure PAM_HOME/conf is symlinked to /config
+  if ! [[ -L "${PAM_HOME}/conf" ]]
   then
-    ln -sf "$ext_conf_path" "${PMP_HOME}/conf"
+    ln -sf "$ext_conf_path" "${PAM_HOME}/conf"
   fi
 
   set_server_state
@@ -61,41 +61,41 @@ wait_for_db() {
   fi
 }
 
-start_pmp() {
-  /etc/init.d/pmp-service start
+start_pam() {
+  /etc/init.d/pam360-service start
 
-  (tail -f "${PMP_HOME}"/logs/*)&
+  (tail -f "${PAM_HOME}"/logs/*)&
 }
 
-wait_for_pmp() {
-  if ! wait-for-it.sh -t "$TIMEOUT_PMP" "localhost:${PMP_PORT}"
+wait_for_pam() {
+  if ! wait-for-it.sh -t "$TIMEOUT_PAM" "localhost:${PAM_PORT}"
   then
-    echo "PMP failed to start - Timeout: ${TIMEOUT_PMP}s" >&2
+    echo "PAM360 failed to start - Timeout: ${TIMEOUT_PAM}s" >&2
     exit 7
   fi
 }
 
-pmp_is_running() {
-  # while ps -aux | grep -q "${PMP_HOME}"
-  /etc/init.d/pmp-service status | grep -q "PMP is running"
+pam_is_running() {
+  # while ps -aux | grep -q "${PAM_HOME}"
+  /etc/init.d/pam360-service status | grep -q "PAM360 is running"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
   sync_pmp_home_dir
 
-  if [[ -n "$PMP_UPGRADE" ]]
+  if [[ -n "$PAM_UPGRADE" ]]
   then
     echo "!!! Started in upgrade mode." >&2
-    echo "The PMP service has *NOT* been started." >&2
-    echo "To disable please unset PMP_UPGRADE." >&2
+    echo "The PAM service has *NOT* been started." >&2
+    echo "To disable please unset PAM_UPGRADE." >&2
     sleep infinity
   else
     # TODO Start the database
-    start_pmp
-    wait_for_pmp
+    start_pam
+    wait_for_pam
 
-    while pmp_is_running
+    while pam_is_running
     do
       sleep 5
     done

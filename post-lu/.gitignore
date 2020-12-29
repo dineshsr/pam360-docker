@@ -4,3 +4,4 @@ config/
 data/
 .envrc
 *.ppm
+*.bin

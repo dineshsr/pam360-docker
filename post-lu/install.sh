@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
+echo ${1}
+
 set -euxo
 
-PMP_VERSION="$1"
-PMP_TMP_HOME="/srv/PMP.orig"
-PMP_INSTALLER="/tmp/pmp_installer.bin"
+PAM_VERSION="$1"
+PAM_TMP_HOME="/srv/PAM.orig"
+PAM_INSTALLER="/tmp/pam_installer.bin"
 
 install_dependencies() {
   apt-get update
@@ -19,41 +21,37 @@ install_dependencies() {
 cleanup() {
   rm -rf \
     /var/lib/apt/lists/* \
-    "${PMP_INSTALLER}" \
+    "${PAM_INSTALLER}" \
     /tmp/pmp.properties
 }
 
-install_pmp() {
-  if [[ -e "${PMP_INSTALLER}" ]]
+install_pam() {
+  if [[ -e "${PAM_INSTALLER}" ]]
   then
-    echo "Using the local install binary at ${PMP_INSTALLER}"
+    echo "Using the local install binary at ${PAM_INSTALLER}"
   else
-    if [[ "$(dpkg --print-architecture)" == "i386" ]]
-    then
-      install_bin=ManageEngine_PMP.bin
-    else
-      install_bin=ManageEngine_PMP_64bit.bin
-    fi
+    echo "Getting Binary from cloud"
+    install_bin=ManageEngine_PAM360_64bit.bin
 
-    url="https://archives2.manageengine.com/passwordmanagerpro/${PMP_VERSION}/${install_bin}"
-    echo "Downloading PMP installer from $url"
-    curl -fsSL -o "${PMP_INSTALLER}" "$url"
+    url="https://archives.manageengine.com/privileged-access-management/${PAM_VERSION}/${install_bin}"
+    echo "Downloading PAM360 installer from $url"
+    curl -fsSL -o "${PAM_INSTALLER}" "$url"
   fi
 
-  chmod +x "${PMP_INSTALLER}"
+  chmod +x "${PAM_INSTALLER}"
 
   mkdir -p "$(dirname "$PMP_HOME")"
   # Update PMP_HOME in properties (/srv/pmp was used as install path at the
   # time of creation of the .properties file)
   sed -i "s|/srv/pmp|${PMP_HOME}|" /tmp/pmp.properties
-  "${PMP_INSTALLER}" -i silent -f /tmp/pmp.properties
-  fix_pmp_home
+  "${PAM_INSTALLER}" -i silent -f /tmp/pmp.properties
+  fix_pam_home
 
   cd "${PMP_HOME}/bin"  # yup. That's required by pmp.sh 🤦
-  bash "${PMP_HOME}/bin/pmp.sh" install | grep "installed successfully"
+  bash "${PMP_HOME}/bin/pam360.sh" install | grep "installed successfully"
 }
 
-fix_pmp_home() {
+fix_pam_home() {
   # If PMP_HOME does not end with a PMP dir then it get installed
   # in PMP_HOME/PMP
   if [[ "$(basename "$PMP_HOME")" != "PMP" ]]
@@ -67,11 +65,11 @@ fix_pmp_home() {
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
-  echo "Building container for PMP ${PMP_VERSION}"
+  echo "Building container for PMP ${PAM_VERSION}"
   install_dependencies
-  install_pmp
+  install_pam
   cleanup
 
   # Move PMP_HOME to PMP_HOME.orig (will be copied over to /data at runtime)
-  mv "$PMP_HOME" "$PMP_TMP_HOME"
+  mv "$PMP_HOME" "$PAM_TMP_HOME"
 fi
