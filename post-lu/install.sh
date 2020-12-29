@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-echo ${1}
-
 set -euxo
 
 PAM_VERSION="$1"
-PAM_TMP_HOME="/srv/PAM.orig"
+PAM_TMP_HOME="/srv/PAM"
 PAM_INSTALLER="/tmp/pam_installer.bin"
 
 install_dependencies() {
@@ -30,7 +28,6 @@ install_pam() {
   then
     echo "Using the local install binary at ${PAM_INSTALLER}"
   else
-    echo "Getting Binary from cloud"
     install_bin=ManageEngine_PAM360_64bit.bin
 
     url="https://archives.manageengine.com/privileged-access-management/${PAM_VERSION}/${install_bin}"
@@ -40,26 +37,28 @@ install_pam() {
 
   chmod +x "${PAM_INSTALLER}"
 
-  mkdir -p "$(dirname "$PMP_HOME")"
-  # Update PMP_HOME in properties (/srv/pmp was used as install path at the
+  mkdir -p "$(dirname "$PAM_HOME")"
+  # Update PAM_HOME in properties (/srv/pmp was used as install path at the
   # time of creation of the .properties file)
-  sed -i "s|/srv/pmp|${PMP_HOME}|" /tmp/pmp.properties
+  sed -i "s|/srv/pam|${PAM_HOME}|" /tmp/pmp.properties
   "${PAM_INSTALLER}" -i silent -f /tmp/pmp.properties
-  fix_pam_home
+  fix_pmp_home
 
-  cd "${PMP_HOME}/bin"  # yup. That's required by pmp.sh 🤦
-  bash "${PMP_HOME}/bin/pam360.sh" install | grep "installed successfully"
+  cd "${PAM_HOME}"
+
+  cd "bin"  # yup. That's required by pmp.sh 🤦
+  bash "${PAM_HOME}/bin/pam360.sh" install | grep "installed successfully"
 }
 
-fix_pam_home() {
-  # If PMP_HOME does not end with a PMP dir then it get installed
-  # in PMP_HOME/PMP
-  if [[ "$(basename "$PMP_HOME")" != "PMP" ]]
+fix_pmp_home() {
+  # If PAM_HOME does not end with a PMP dir then it get installed
+  # in PAM_HOME/PMP
+  if [[ "$(basename "$PAM_HOME")" != "PAM360" ]]
   then
-    mv "${PMP_HOME}/PMP" "/tmp/pmp.tmp"
-    mv "${PMP_HOME}" "/tmp/pmp_deleteme"
+    mv "${PAM_HOME}/PAM360" "/tmp/pmp.tmp"
+    mv "${PAM_HOME}" "/tmp/pmp_deleteme"
     rmdir "/tmp/pmp_deleteme"
-    mv "/tmp/pmp.tmp" "${PMP_HOME}"
+    mv "/tmp/pmp.tmp" "${PAM_HOME}"
   fi
 }
 
@@ -70,6 +69,6 @@ then
   install_pam
   cleanup
 
-  # Move PMP_HOME to PMP_HOME.orig (will be copied over to /data at runtime)
-  mv "$PMP_HOME" "$PAM_TMP_HOME"
+  # Move PAM_HOME to PAM_HOME.orig (will be copied over to /data at runtime)
+  mv "$PAM_HOME" "$PAM_TMP_HOME"
 fi

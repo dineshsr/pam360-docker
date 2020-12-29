@@ -13,7 +13,7 @@ TIMEOUT_PAM=${TIMEOUT_PAM:-600}
 PAM_PORT=${PAM_PORT:-8282}
 
 sync_pmp_home_dir() {
-  local PAM_TMP_HOME="/srv/PMP.orig"
+  local PAM_TMP_HOME="/srv/PAM"
   local lockfile="${PAM_HOME}/.INIT_SYNC_DONE"
 
   if ! [[ -e "$lockfile" ]]

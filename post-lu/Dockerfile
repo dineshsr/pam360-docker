@@ -26,6 +26,4 @@ EXPOSE 3456/tcp 8282/tcp 22/tcp 23/tcp 389/tcp 636/tcp 25/tcp 1443/tcp 1521/tcp 
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-VOLUME ["/data"]
-
 HEALTHCHECK --start-period=5m CMD curl -fqskL https://localhost:8282
