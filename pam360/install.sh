@@ -8,12 +8,21 @@ PAM_INSTALLER="/tmp/pam_installer.bin"
 
 install_dependencies() {
   apt-get update
-  apt-get install -y curl unzip
+  apt-get install -y curl install iputils-ping sudo nano unzip
 
   curl -fsSL https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh \
     -o /usr/bin/wait-for-it.sh
 
   chmod +x /usr/bin/wait-for-it.sh
+}
+
+add_and_elivate_user(){
+
+  useradd -m -d /home/${USER} ${USER} && chown -R ${USER} /home/${USER}
+
+  usermod -aG sudo ${USER}
+
+  echo "${USER}:${PASSWORD}" | chpasswd
 }
 
 cleanup() {
@@ -66,6 +75,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
   echo "Building container for PMP ${PAM_VERSION}"
   install_dependencies
+  add_and_elivate_user
   install_pam
   cleanup
 

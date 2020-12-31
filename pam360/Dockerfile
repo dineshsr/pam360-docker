@@ -2,25 +2,20 @@ ARG BASE_IMAGE=ubuntu:20.04
 
 FROM ${BASE_IMAGE}
 
-ENV user pamuser
-ENV password Test@123
+ARG USER=pamuser
+ARG PWD=Test@123
 
-RUN useradd -m -d /home/${user} ${user} && chown -R ${user} /home/${user}
-
-RUN usermod -aG sudo ${user}
-
-RUN echo "${user}:${password}" | chpasswd
-USER ${user}
-
-ARG PAM_HOME=/home/${user}/PAM360
+ARG PAM_HOME=/home/${USER}/PAM360
 ARG PAM_VERSION=5000
 
 ENV PAM_VERSION=$PAM_VERSION \
     PAM_HOME=$PAM_HOME \
-    SERVER_STATE=master \
+    SERVER_STATE=master \ 
     TIMEOUT_DB=120 \
     TIMEOUT_PMP=600 \
-    PAM_PORT=8282
+    PAM_PORT=8282 \
+    USER=$USER \ 
+    PASSWORD=$PWD
 
 WORKDIR /home/${user}
 
