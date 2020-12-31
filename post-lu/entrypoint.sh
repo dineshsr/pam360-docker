@@ -64,7 +64,7 @@ wait_for_db() {
 start_pam() {
   /etc/init.d/pam360-service start
 
-  (tail -f "${PAM_HOME}"/logs/*)&
+  (tail -f "${PAM_HOME}"PAM/logs/*)&
 }
 
 wait_for_pam() {

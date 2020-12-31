@@ -13,7 +13,6 @@ ENV PAM_VERSION=$PAM_VERSION \
     PAM_PORT=8282
 
 COPY pmp.properties /tmp/pmp.properties
-COPY pam_installer.bin /tmp/pam_installer.bin
 COPY entrypoint.sh /entrypoint.sh
 COPY install.sh /install.sh
 
