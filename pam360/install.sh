@@ -8,7 +8,7 @@ PAM_INSTALLER="/tmp/pam_installer.bin"
 
 install_dependencies() {
   apt-get update
-  apt-get install -y curl install iputils-ping sudo nano unzip
+  apt-get install -y curl iputils-ping sudo nano unzip
 
   curl -fsSL https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh \
     -o /usr/bin/wait-for-it.sh
@@ -29,7 +29,7 @@ cleanup() {
   rm -rf \
     /var/lib/apt/lists/* \
     "${PAM_INSTALLER}" \
-    /tmp/pmp.properties
+    /pmp.properties
 }
 
 install_pam() {
@@ -49,8 +49,8 @@ install_pam() {
   mkdir -p "$(dirname "$PAM_HOME")"
   # Update PAM_HOME in properties (/srv/pmp was used as install path at the
   # time of creation of the .properties file)
-  sed -i "s|/srv/pam|${PAM_HOME}|" /tmp/pmp.properties
-  "${PAM_INSTALLER}" -i silent -f /tmp/pmp.properties
+  sed -i "s|/srv/pam|${PAM_HOME}|" /pmp.properties
+  "${PAM_INSTALLER}" -i silent -f /pmp.properties
   fix_pmp_home
 
   cd "${PAM_HOME}"

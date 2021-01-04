@@ -61,10 +61,24 @@ wait_for_db() {
   fi
 }
 
-start_pam() {
-  /etc/init.d/pam360-service start
+install_pam_service (){
 
-  (tail -f "${PAM_HOME}"PAM/logs/*)&
+  echo "Installing service..."
+  serviceName="pam360-service"
+  if systemctl --all --type service | grep -q "$serviceName";
+    then
+      echo "$serviceName exists."
+    else
+      echo "$serviceName does NOT exist."
+      bash "${PAM_HOME}/PAM/bin/pam360.sh" install | grep "installed successfully".
+  fi
+}
+
+start_pam() {
+
+  /home/pamuser/PAM360/PAM/bin/pam360-service start
+
+  (tail -f "${PAM_HOME}"/PAM/logs/wrapper.log)&
 }
 
 wait_for_pam() {
@@ -77,7 +91,7 @@ wait_for_pam() {
 
 pam_is_running() {
   # while ps -aux | grep -q "${PAM_HOME}"
-  /etc/init.d/pam360-service status | grep -q "PAM360 is running"
+  /home/pamuser/PAM360/PAM/bin/pam360-service status | grep  "PAM360"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
@@ -92,12 +106,13 @@ then
     sleep infinity
   else
     # TODO Start the database
+    install_pam_service
     start_pam
     wait_for_pam
 
     while pam_is_running
     do
-      sleep 5
+      sleep 30
     done
   fi
 fi
